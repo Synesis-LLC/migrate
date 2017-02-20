@@ -5,7 +5,6 @@ __[v3.0 in the making](https://github.com/Synesis-LLC/migrate/tree/v3.0-prev)__
 # migrate
 
 [![Build Status](https://travis-ci.org/Synesis-LLC/migrate.svg?branch=master)](https://travis-ci.org/Synesis-LLC/migrate)
-[![GoDoc](https://godoc.org/github.com/Synesis-LLC/migrate?status.svg)](https://godoc.org/github.com/Synesis-LLC/migrate)
 
 A migration helper written in Go. Use it in your existing Golang code 
 or run commands via the CLI. 
