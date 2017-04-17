@@ -180,6 +180,9 @@ func (driver *Driver) Version() (uint64, error) {
 func (driver *Driver) GetAppliedVersions() ([]uint64, error) {
 	versions := make([]uint64, 0)
 	err := driver.session.Query(fmt.Sprintf("SELECT version FROM %s", tableName)).Scan(&versions)
+	if err == gocql.ErrNotFound {
+		return versions, nil
+	}
 	return versions, err
 }
 
