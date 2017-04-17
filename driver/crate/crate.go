@@ -63,6 +63,15 @@ func (driver *Driver) Version() (uint64, error) {
 	}
 }
 
+func (driver *Driver) GetAppliedVersions() ([]uint64, error) {
+	versions := make([]uint64, 0)
+	err := driver.db.QueryRow("SELECT version FROM " + tableName + " ORDER BY version DESC").Scan(&versions)
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+	return versions, err
+}
+
 func (driver *Driver) Migrate(f file.File, pipe chan interface{}) {
 	defer close(pipe)
 	pipe <- f

@@ -105,6 +105,28 @@ func (d *Driver) Version() (uint64, error) {
 	}
 }
 
+func (driver *Driver) GetAppliedVersions() ([]uint64, error) {
+	versions := make([]uint64, 0)
+	var currentVersion uint64
+	rows, err := driver.db.Query("SELECT version FROM " + tableName + " ORDER BY version DESC")
+	if err == sql.ErrNoRows {
+		return versions, nil
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&currentVersion)
+		if err != nil {
+			return []uint64{}, err
+		}
+		versions = append(versions, currentVersion)
+	}
+	err = rows.Err()
+	if err != nil {
+		return []uint64{}, err
+	}
+	return versions, err
+}
+
 func (d *Driver) ensureVersionTableExists() error {
 	tx, err := d.db.Begin()
 	if err != nil {

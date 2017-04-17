@@ -5,11 +5,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/Synesis-LLC/migrate/driver"
 	"github.com/Synesis-LLC/migrate/file"
 	"github.com/Synesis-LLC/migrate/migrate/direction"
 	"github.com/jmcvetta/neoism"
-	"strings"
 )
 
 type Driver struct {
@@ -159,6 +160,27 @@ func (driver *Driver) Version() (uint64, error) {
 		return 0, err
 	}
 	return res[0].Version, nil
+}
+
+func (driver *Driver) GetAppliedVersions() ([]uint64, error) {
+	res := []struct {
+		Version uint64 `json:"n.version"`
+	}{}
+	versions := make([]uint64, 0)
+
+	cq := neoism.CypherQuery{
+		Statement: `MATCH (n:SchemaMigration)
+      RETURN n.version ORDER BY n.version DESC`,
+		Result: &res,
+	}
+
+	if err := driver.db.Cypher(&cq); err != nil || len(res) == 0 {
+		return versions, err
+	}
+	for _, v := range res {
+		versions = append(versions, v.Version)
+	}
+	return versions, nil
 }
 
 func init() {

@@ -26,7 +26,14 @@ func Up(pipe chan interface{}, url, migrationsPath string) {
 		return
 	}
 
-	applyMigrationFiles, err := files.ToLastFrom(version)
+	appliedVersions, err := d.GetAppliedVersions()
+	if err != nil {
+		pipe <- err
+		go pipep.Close(pipe, err)
+		return
+	}
+
+	applyMigrationFiles, err := files.ToLastFrom(version, appliedVersions)
 	if err != nil {
 		if err2 := d.Close(); err2 != nil {
 			pipe <- err2

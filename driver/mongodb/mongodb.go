@@ -121,6 +121,27 @@ func (driver *Driver) Version() (uint64, error) {
 		return latestMigration.Version, nil
 	}
 }
+
+func (driver *Driver) GetAppliedVersions() ([]uint64, error) {
+	migrations := make([]DbMigration, 0)
+	versions := make([]uint64, 0)
+	c := driver.Session.DB(driver.methodsReceiver.DbName()).C(MIGRATE_C)
+
+	err := c.Find(bson.M{}).Sort("-version").All(&migrations)
+
+	switch {
+	case err == mgo.ErrNotFound:
+		return versions, nil
+	case err != nil:
+		return versions, err
+	default:
+		for _, m := range migrations {
+			versions = append(versions, m.Version)
+		}
+		return versions, nil
+	}
+}
+
 func (driver *Driver) Migrate(f file.File, pipe chan interface{}) {
 	defer close(pipe)
 	pipe <- f

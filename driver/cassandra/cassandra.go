@@ -177,6 +177,12 @@ func (driver *Driver) Version() (uint64, error) {
 	return uint64(version), err
 }
 
+func (driver *Driver) GetAppliedVersions() ([]uint64, error) {
+	versions := make([]uint64, 0)
+	err := driver.session.Query(fmt.Sprintf("SELECT version FROM %s", tableName)).Scan(&versions)
+	return versions, err
+}
+
 func init() {
 	driver.RegisterDriver("cassandra", &Driver{})
 }

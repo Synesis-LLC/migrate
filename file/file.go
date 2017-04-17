@@ -91,12 +91,22 @@ func (mf *MigrationFiles) ToFirstFrom(version uint64) (Files, error) {
 
 // ToLastFrom fetches all (up) migration files to the most recent migration file.
 // The migration file of the current version is not included.
-func (mf *MigrationFiles) ToLastFrom(version uint64) (Files, error) {
+func (mf *MigrationFiles) ToLastFrom(version uint64, appliedVersions []uint64) (Files, error) {
 	sort.Sort(mf)
 	files := make(Files, 0)
 	for _, migrationFile := range *mf {
 		if migrationFile.Version > version && migrationFile.UpFile != nil {
 			files = append(files, *migrationFile.UpFile)
+		} else {
+			found := false
+			for _, v := range appliedVersions {
+				if v == migrationFile.Version {
+					found = true
+				}
+			}
+			if !found {
+				return files, fmt.Errorf("Inconsistent migrations state: migrations file %d has not been applied yet", migrationFile.Version)
+			}
 		}
 	}
 	return files, nil

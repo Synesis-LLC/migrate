@@ -199,7 +199,8 @@ func TestFiles(t *testing.T) {
 	}
 
 	// test ToLastFrom
-	tofFiles, err := files.ToLastFrom(0)
+	versions := []uint64{401}
+	tofFiles, err := files.ToLastFrom(0, versions)
 	if err != nil {
 		t.Fatal(err)
 	}

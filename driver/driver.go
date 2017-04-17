@@ -32,6 +32,9 @@ type Driver interface {
 
 	// Version returns the current migration version.
 	Version() (uint64, error)
+
+	// GetAppliedVersions returns all applied migrationsPath
+	GetAppliedVersions() ([]uint64, error)
 }
 
 // New returns Driver and calls Initialize on it
